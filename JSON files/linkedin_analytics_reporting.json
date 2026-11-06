@@ -1,0 +1,307 @@
+{
+  "name": "LinkedIn Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "367c910c-8172-4329-ad3b-6f8034c690a7",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1060554671,
+          "mode": "list",
+          "cachedResultName": "LinkedIn_Analytics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=1060554671"
+        },
+        "options": {}
+      },
+      "id": "54993f09-89db-4de8-acbb-922cd998b899",
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst rows = $input.all();\n\nreturn rows.map(item => {\n  const impressions = Number(item.json.impressions || 0);\n  const reactions = Number(item.json.reactions || 0);\n  const comments = Number(item.json.comments || 0);\n  const reposts = Number(item.json.reposts || 0);\n\n  const totalEngagement = reactions + comments + reposts;\n\n  const engagementRate = impressions > 0\n    ? (totalEngagement / impressions) * 100\n    : 0;\n\n  return {\n    json: {\n      ...item.json,\n      engagement_rate: Number(engagementRate.toFixed(2))\n    }\n  };\n});"
+      },
+      "id": "051a22fc-c39f-4129-a70f-7b6f0b094b2f",
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1060554671,
+          "mode": "list",
+          "cachedResultName": "linkedin analytics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=1060554671"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "topic_id": "={{ $json.topic_id }}",
+            "post_date": "={{ $json.post_date }}",
+            "post_topic": "={{ $json.post_topic }}",
+            "impressions": "={{ $json.impressions }}",
+            "reactions": "={{ $json.reactions }}",
+            "comments": "={{ $json.comments }}",
+            "reposts": "={{ $json.reposts }}",
+            "engagement_rate": "={{ $json.engagement_rate }}"
+          },
+          "matchingColumns": [
+            "topic_id"
+          ],
+          "schema": [
+            {
+              "id": "topic_id",
+              "displayName": "topic_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "post_date",
+              "displayName": "post_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "post_topic",
+              "displayName": "post_topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "impressions",
+              "displayName": "impressions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reactions",
+              "displayName": "reactions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reposts",
+              "displayName": "reposts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "engagement_rate",
+              "displayName": "engagement_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "performance_notes",
+              "displayName": "performance_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fea700fa-f29f-4847-87cb-ea5637583925",
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build a weekly LinkedIn summary from all rows\nconst rows = $input.all().map(item => item.json);\n\n// Today's date in India timezone (YYYY-MM-DD)\nconst today = new Intl.DateTimeFormat('en-CA', {\n  timeZone: 'Asia/Kolkata',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit'\n}).format(new Date());\n\n// Convert date to UTC day number for reliable comparison\nconst todayDate = new Date(today + 'T00:00:00Z');\nconst todayDay = Math.floor(todayDate.getTime() / 86400000);\n\n// Last 7 calendar days, including today\nconst startDay = todayDay - 6;\n\nfunction parseDate(value) {\n  if (!value) return null;\n\n  const text = String(value).trim();\n\n  // Google Sheets date format: MM/DD/YYYY\n  const usDate = text.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (usDate) {\n    const [, month, day, year] = usDate;\n    return Date.UTC(Number(year), Number(month) - 1, Number(day)) / 86400000;\n  }\n\n  // ISO date format: YYYY-MM-DD\n  const isoDate = text.match(/^(\\d{4})-(\\d{2})-(\\d{2})/);\n  if (isoDate) {\n    const [, year, month, day] = isoDate;\n    return Date.UTC(Number(year), Number(month) - 1, Number(day)) / 86400000;\n  }\n\n  return null;\n}\n\nfunction formatDay(dayNumber) {\n  return new Date(dayNumber * 86400000).toISOString().slice(0, 10);\n}\n\n// Keep only posts from the last 7 days\nconst weeklyPosts = rows.filter(row => {\n  const day = parseDate(row.post_date);\n  return day !== null && day >= startDay && day <= todayDay;\n});\n\nlet totalImpressions = 0;\nlet totalReactions = 0;\nlet totalComments = 0;\nlet totalReposts = 0;\nlet rateSum = 0;\nlet bestPost = null;\n\nfor (const post of weeklyPosts) {\n  const rate = Number(post.engagement_rate || 0);\n  totalImpressions += Number(post.impressions || 0);\n  totalReactions += Number(post.reactions || 0);\n  totalComments += Number(post.comments || 0);\n  totalReposts += Number(post.reposts || 0);\n  rateSum += rate;\n\n  if (!bestPost || rate > Number(bestPost.engagement_rate || 0)) {\n    bestPost = post;\n  }\n}\n\nconst totalPosts = weeklyPosts.length;\nconst averageRate = totalPosts > 0 ? rateSum / totalPosts : 0;\n\nreturn [\n  {\n    json: {\n      report_period: formatDay(startDay) + ' to ' + formatDay(todayDay),\n      total_posts: totalPosts,\n      total_impressions: totalImpressions,\n      total_reactions: totalReactions,\n      total_comments: totalComments,\n      total_reposts: totalReposts,\n      average_engagement_rate: Number(averageRate.toFixed(2)),\n      best_performing_post: bestPost\n        ? (bestPost.post_topic || 'Untitled') + ' (' + (bestPost.topic_id || '') + ')'\n        : 'No posts in this period',\n      best_post_engagement_rate: bestPost ? Number(Number(bestPost.engagement_rate || 0).toFixed(2)) : 0\n    }\n  }\n];"
+      },
+      "id": "a47e4f89-818c-4dc7-b4bc-b3050758e922",
+      "name": "Code in JavaScript1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_EMAIL@example.com",
+        "subject": "={{ '📊 Weekly LinkedIn Analytics Report - ' + $now.toFormat('dd MMM yyyy') }}",
+        "message": "=<h2>📊 Weekly LinkedIn Performance Report</h2>  <p>Hi Subham,</p>  <p>Here is your LinkedIn content performance summary.</p>  <p><b>Report Period:</b> {{ $json.report_period }}</p>  <hr>  <h3>📈 Performance Overview</h3>  <ul>   <li><b>Total Posts:</b> {{ $json.total_posts }}</li>   <li><b>Total Impressions:</b> {{ $json.total_impressions }}</li>   <li><b>Total Reactions:</b> {{ $json.total_reactions }}</li>   <li><b>Total Comments:</b> {{ $json.total_comments }}</li>   <li><b>Total Reposts:</b> {{ $json.total_reposts }}</li>   <li><b>Average Engagement Rate:</b> {{ $json.average_engagement_rate }}%</li> </ul>  <hr>  <h3>🏆 Best Performing Post</h3>  <p><b>{{ $json.best_performing_post }}</b></p>  <p>Engagement Rate: {{ $json.best_post_engagement_rate }}%</p>  <hr>  <p><i>This report was automatically generated by your LinkedIn Analytics workflow.</i></p>",
+        "options": {}
+      },
+      "id": "3f98075a-8798-43ae-b74c-1ce68257be79",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
